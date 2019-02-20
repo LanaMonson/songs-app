@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+mongoose.plugin(schema => { schema.options.usePushEach = true });
 const Schema = mongoose.Schema;
 
 const SongSchema = new Schema({
@@ -15,15 +16,15 @@ const SongSchema = new Schema({
 
 SongSchema.statics.addLyric = function(id, content) {
   const Lyric = mongoose.model('lyric');
-
+  console.log(`${id}, ${content}`)
   return this.findById(id)
     .then(song => {
       const lyric = new Lyric({ content, song })
       song.lyrics.push(lyric)
       return Promise.all([lyric.save(), song.save()])
-        .then(([lyric, song]) => song);
+        .then(([lyric, song]) => song).catch((err) => console.log(err));
     });
-}
+}//'MongoError', modifier: $pushAll'
 
 SongSchema.statics.findLyrics = function(id) {
   return this.findById(id)
